@@ -2,13 +2,27 @@ import Image from 'next/image'
 import { Indie_Flower } from 'next/font/google'
 import ListItem from './components/listItem'
 
+import { Todo } from '<prefix>/typings'
+import Link from 'next/link'
+
+
 const indie = Indie_Flower({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-indie'
 })
 
-export default function Home() {
+const fetchTodos = async () => {
+  const res = await fetch("https://jsonplaceholder.typicode.com/todos/");
+  const todos: Todo[] = await res.json()
+
+  return todos;
+}
+
+export default async function Home() {
+  const todos = await fetchTodos()
+  const slicedTodos = todos.slice(0, 5)
+
   return (
     <div className={`${indie.variable} font-sans`}>
       <div className='flex items-center justify-center h-screen'>
@@ -25,9 +39,13 @@ export default function Home() {
 
           <div className='flex flex-col text-xl'>
             <ul>
-              <li>
-                <ListItem />
-              </li>
+              {slicedTodos.map((todo) => (
+                <li key={todo.id}>
+                  <input type="checkbox" />
+                    <span>{todo.id}. {todo.title}</span>
+                  <button>Delete</button>
+                </li>
+              ))}
             </ul>
           </div>
 
